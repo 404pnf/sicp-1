@@ -172,6 +172,13 @@
                [`((,var ,val) ...) bindings])
     `((lambda ,var ,body) ,@val)))
 
+;; let*
+(define (let*->nested-lets lexpr)
+  (match lexpr
+    [`(let* (,first-binding ,rest-bindings ...) ,body)
+     `(let (,first-binding) ,(let*->nested-lets `(let* ,rest-bindings ,body)))]
+     [`(let* () ,body) body]))
+
 ;; eval
 (define (eval exp env)
   (match exp
@@ -186,6 +193,7 @@
     [`(begin ,exp ...) (eval-sequence exp env)]
     [`(cond ,clauses ...) (eval (cond->if clauses) env)]
     [`(let ,bindings ,body) (eval (let->combination exp) env)]
+    [`(let* ,bindings ,body) (eval (let*->nested-lets exp) env)]
     [(list f x ...) (apply (eval f env) (list-of-values x env))]
     [_ (error "unable to evaluate expression -- EVAL " exp)]))
 
