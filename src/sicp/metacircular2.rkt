@@ -61,7 +61,10 @@
   (if (eq? env the-empty-environment)
       (error "unbound variable:" var)
       (let ([frame (first-frame env)])
-        (hash-ref frame var (lambda () (lookup-variable-value var (enclosing-environment env)))))))
+        (let ([value (hash-ref frame var (lambda () (lookup-variable-value var (enclosing-environment env))))])
+          (if (eq? value '*unassigned*)
+              (error "evaluating a variable that is not assigned a value -- " var)
+              value)))))
 
 (define (set-variable-value! var val env)
   (if (eq? env the-empty-environment)
@@ -189,9 +192,22 @@
         ,rest))]
     [_  body]))
 
+;; letrec
+(define (letrec->combination lexpr)
+  (match lexpr
+    [`(letrec (,bindings ...) ,body ..1)
+     `(let ,(map (lambda (v) (list (car v) ''*unassigned*)) bindings)
+        ,@(map (lambda (binding) 
+                 (let ([name (car binding)]
+                       [value (cadr binding)])
+                   `(set! ,name ,value))) 
+               bindings)
+        ,@body)]))
+
 ;; eval
 (define (eval exp env)
-  (display (format "~s~%" exp))
+  ;; use this display statement to visualize the recursive evaluation process
+  ;;(display (format "~s~%" exp))
   (match exp
     [(? self-evaluating? exp) exp]
     [(? variable? exp) (lookup-variable-value exp env)]
@@ -205,6 +221,7 @@
     [`(cond ,clauses ...) (eval (cond->if clauses) env)]
     [`(let ,bindings ,body ..1) (eval (let->combination exp) env)]
     [`(let* ,bindings ,body ..1) (eval (let*->nested-lets exp) env)]
+    [`(letrec ,bindings ,body ..1) (eval (letrec->combination exp) env)]
     [(list f x ...) (apply (eval f env) (list-of-values x env))]
     [_ (error "unable to evaluate expression -- EVAL " exp)]))
 
