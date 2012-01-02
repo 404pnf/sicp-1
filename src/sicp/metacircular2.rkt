@@ -4,6 +4,8 @@
                     (apply apply-in-underlying-scheme)
                     (eval eval-in-underlying-scheme)))
 
+(provide (all-defined-out))
+
 (define (self-evaluating? expr)
   (match expr
     [(? number? expr) #t]
