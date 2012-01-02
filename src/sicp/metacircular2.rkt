@@ -61,7 +61,7 @@
 
 (define (lookup-variable-value var env)
   (if (eq? env the-empty-environment)
-      (error "unbound variable:" var)
+      (error "unbound variable: " var)
       (let ([frame (first-frame env)])
         (let ([value (hash-ref frame var (lambda () (lookup-variable-value var (enclosing-environment env))))])
           (if (eq? value '*unassigned*)
@@ -70,7 +70,7 @@
 
 (define (set-variable-value! var val env)
   (if (eq? env the-empty-environment)
-      (error "unbound variable")
+      (error "unbound variable: " var)
       (let ([frame (first-frame env)])
         (if (hash-has-key? frame var)
             (hash-set! frame var val)
@@ -95,7 +95,9 @@
         (list '- -)
         (list '* *)
         (list '/ /)
-        (list '= =)))
+        (list '= =)
+        (list '> >)
+        (list '< <)))
 
 (define (primitive-procedure-names)
   (map car primitive-procedures))
@@ -109,7 +111,7 @@
    (primitive-implementation proc) args))
 
 ;; global env
-(define (setup-environment)
+(define (make-environment)
   (let ((initial-env
          (extend-environment (primitive-procedure-names)
                              (primitive-procedure-objects)
@@ -118,7 +120,7 @@
     (define-variable! 'false false initial-env)
     initial-env))
 
-(define the-global-environment (setup-environment))
+(define the-global-environment (make-environment))
 
 ;; application
 (define (list-of-values exps env)
