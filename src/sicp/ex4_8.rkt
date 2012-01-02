@@ -45,7 +45,8 @@
           [body (let-body expr)])
       (if (not (let-name expr))
           (cons (make-lambda vars body) vals)
-          (list (list 'define (let-name expr) (make-lambda vars body))
+          (list 'begin 
+                (list 'define (let-name expr) (make-lambda vars body))
                 (list (let-name expr) vals))))))
 
 (define ns (make-base-namespace))
