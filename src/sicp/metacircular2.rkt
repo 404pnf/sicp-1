@@ -180,6 +180,13 @@
                [`((,var ,val) ...) bindings])
     `((lambda ,var ,@body) ,@val)))
 
+;; named let
+(define (named-let->combination lexpr)
+  (match-let* ([`(let ,(? symbol? name) ,(? (lambda (x) (or (pair? x) (empty? x))) bindings) ,body ..1) lexpr]
+               [`((,var ,val) ...) bindings])
+    `(begin (define ,name (lambda ,var ,@body))
+            (,name ,@val))))
+
 ;; let*
 (define (let*->nested-lets lexpr)
   (match lexpr
@@ -223,7 +230,8 @@
     [`(lambda ,parameters ,body ..1) (make-procedure parameters body env)]
     [`(begin ,exp ...) (eval-sequence exp env)]
     [`(cond ,clauses ...) (eval (cond->if clauses) env)]
-    [`(let ,bindings ,body ..1) (eval (let->combination exp) env)]
+    [`(let ,(? (lambda (x) (or (pair? x) (empty? x))) bindings) ,body ..1) (eval (let->combination exp) env)]
+    [`(let ,(? symbol? name) ,bindings ,body ..1) (eval (named-let->combination exp) env)]
     [`(let* ,bindings ,body ..1) (eval (let*->nested-lets exp) env)]
     [`(letrec ,bindings ,body ..1) (eval (letrec->combination exp) env)]
     [(list f x ...) (apply (eval f env) (list-of-values x env))]
