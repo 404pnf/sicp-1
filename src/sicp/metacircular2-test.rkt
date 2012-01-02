@@ -34,7 +34,35 @@
                             (* x z))
                          env1)
                    39
-                   "let* test"))))
+                   "let* test")
+     (eval '(define (f x)
+              (define (even? n)
+                (if (= n 0)
+                    true
+                    (odd? (- n 1))))
+              (define (odd? n)
+                (if (= n 0)
+                    false
+                    (even? (- n 1))))
+              (odd? x))
+           env1)
+     (check-equal? (eval '(f 2) env1) false "internal definitions")
+     (check-equal? (eval '(f 3) env1) true "internal definitions")
+     (eval '(define (f1 x)
+              (letrec ((even?
+                        (lambda (n)
+                          (if (= n 0)
+                              true
+                              (odd? (- n 1)))))
+                       (odd?
+                        (lambda (n)
+                          (if (= n 0)
+                              false
+                              (even? (- n 1))))))
+                (even? x)))
+           env1)
+     (check-equal? (eval '(f1 2) env1) true "internal definitions")
+     (check-equal? (eval '(f1 3) env1) false "internal definitions"))))
 
 
 (run-tests metacircular2-tests)
