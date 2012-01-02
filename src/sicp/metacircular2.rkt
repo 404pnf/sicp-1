@@ -176,7 +176,7 @@
 
 ;; let
 (define (let->combination lexpr)
-  (match-let* ([`(let ,bindings ,body ..1) lexpr]
+  (match-let* ([`(let ,(? (lambda (x) (or (pair? x) (empty? x))) bindings) ,body ..1) lexpr]
                [`((,var ,val) ...) bindings])
     `((lambda ,var ,@body) ,@val)))
 
