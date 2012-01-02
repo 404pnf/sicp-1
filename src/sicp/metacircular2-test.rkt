@@ -62,7 +62,16 @@
                 (even? x)))
            env1)
      (check-equal? (eval '(f1 2) env1) true "internal definitions")
-     (check-equal? (eval '(f1 3) env1) false "internal definitions"))))
+     (check-equal? (eval '(f1 3) env1) false "internal definitions")
+     (eval '(define (fib n)
+              (let fib-iter ((a 1)
+                             (b 0)
+                             (count n))
+                (if (= count 0)
+                    b
+                    (fib-iter (+ a b) a (- count 1)))))
+           env1)
+     (check-equal? (eval '(fib 10) env1) 55 "named let"))))
 
 
 (run-tests metacircular2-tests)
