@@ -77,7 +77,8 @@
                   1
                   (* (factorial (- n 1)) n)))
            env1)
-     (check-equal? (eval '(factorial 10) env1) 3628800 "factorial test"))))
+     (check-equal? (eval '(factorial 10) env1) 3628800 "factorial test")
+     (check-equal? (eval '(unless true "true" "false") env1) "false" "unless test 1"))))
 
 
 (run-tests metacircular2-tests)

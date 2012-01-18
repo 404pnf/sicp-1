@@ -227,6 +227,7 @@
     [`(define ,(? (lambda (x) (not (pair? x))) var) ,b) (define-variable! var (eval b env) env)]
     [`(define ,(? pair? var) ,b ..1) (define-variable! (car var) (eval (make-lambda (cdr var) b) env) env)]
     [`(if ,pred ,consequent ,alternative) (if (true? (eval pred env)) (eval consequent env) (eval alternative env))]
+    [`(unless ,condition ,consequent ,alternative) (if (true? (eval condition env)) (eval alternative env) (eval consequent env))]
     [`(lambda ,parameters ,body ..1) (make-procedure parameters body env)]
     [`(begin ,exp ...) (eval-sequence exp env)]
     [`(cond ,clauses ...) (eval (cond->if clauses) env)]
