@@ -71,7 +71,13 @@
                     b
                     (fib-iter (+ a b) a (- count 1)))))
            env1)
-     (check-equal? (eval '(fib 10) env1) 55 "named let"))))
+     (check-equal? (eval '(fib 10) env1) 55 "named let")
+     (eval '(define (factorial n)
+              (if (= n 1)
+                  1
+                  (* (factorial (- n 1)) n)))
+           env1)
+     (check-equal? (eval '(factorial 10) env1) 3628800 "factorial test"))))
 
 
 (run-tests metacircular2-tests)
