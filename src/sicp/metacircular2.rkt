@@ -15,12 +15,12 @@
 
 (define (variable? expr) (symbol? expr))
 
-
 ;; sequence
 (define (eval-sequence exps env)
-  (cond ((last-exp? exps) (eval (first-exp exps) env))
-        (else (eval (first-exp exps) env)
-              (eval-sequence (rest-exps exps) env))))
+  (cond 
+    [(last-exp? exps) (eval (first-exp exps) env)]
+    [else (eval (first-exp exps) env)
+          (eval-sequence (rest-exps exps) env)]))
 
 ;; begin
 (define (last-exp? seq) (null? (cdr seq)))
@@ -145,11 +145,11 @@
   (match procedure
     [`(primitive ,f ...)  (apply-primitive-procedure procedure arguments)]
     [`(procedure ,f ...)  (eval-sequence
-                       (procedure-body procedure)
-                       (extend-environment
-                        (procedure-parameters procedure)
-                        arguments
-                        (procedure-environment procedure)))]
+                           (procedure-body procedure)
+                           (extend-environment
+                            (procedure-parameters procedure)
+                            arguments
+                            (procedure-environment procedure)))]
     [_                (error "Unknown procedure type -- APPLY" procedure)]))
 
 ;; truth
@@ -235,7 +235,7 @@
     [`(let ,(? symbol? name) ,bindings ,body ..1) (eval (named-let->combination exp) env)]
     [`(let* ,bindings ,body ..1) (eval (let*->nested-lets exp) env)]
     [`(letrec ,bindings ,body ..1) (eval (letrec->combination exp) env)]
-    [(list f x ...) (apply (eval f env) (list-of-values x env))]
+    [`(,f ,x ...) (apply (eval f env) (list-of-values x env))]
     [_ (error "unable to evaluate expression -- EVAL " exp)]))
 
 
