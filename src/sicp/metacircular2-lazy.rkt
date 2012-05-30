@@ -97,7 +97,9 @@
         (list '/ /)
         (list '= =)
         (list '> >)
-        (list '< <)))
+        (list '< <)
+        (list 'newline newline)
+        (list 'display display)))
 
 (define (primitive-procedure-names)
   (map car primitive-procedures))
@@ -142,6 +144,7 @@
 (define (procedure-environment p) (cadddr p))
 
 (define (apply procedure arguments env)
+  ;;(display (format "~s~%" arguments))
   (match procedure
     [`(primitive ,f ...)  (apply-primitive-procedure procedure (list-of-arg-values arguments env))]
     [`(procedure ,f ...)  (eval-sequence
@@ -229,11 +232,17 @@
 
 ;; thunks
 (define (actual-value exp env)
+  ;(display (format "eval expr ~s~%" exp))
+  ;(newline)
   (force-it (eval exp env)))
 
 (define (force-it obj)
+  ;; (display (format "~s~%" obj))
   (match obj
-    [`(thunk ,exp ,env) (actual-value exp env)]
+    [`(thunk ,exp ,env) (begin
+                          ;(display (format "eval's output ~s~%" obj))
+                          ;(newline)
+                          (actual-value exp env))]
     [_ obj]))
 
 (define (delay-it exp env)
