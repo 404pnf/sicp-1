@@ -253,9 +253,9 @@
 
 (define (quote->cons exp)
   ;(display (format "q->c: ~s~%" exp))
-  (if (null? exp)
-      '()
-      (list 'cons (list 'quote (car exp)) (quote->cons (cdr exp)))))
+  (match exp
+    [(? null?)  '()]
+    [_          `(cons (quote ,(car exp)) ,(quote->cons (cdr exp)))]))
 
 ;; eval
 (define (eval exp env)
