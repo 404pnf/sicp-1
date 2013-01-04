@@ -1,5 +1,5 @@
 #lang racket
-(provide amb assert)
+(provide amb assert collect)
 
 (define failures null)
 
